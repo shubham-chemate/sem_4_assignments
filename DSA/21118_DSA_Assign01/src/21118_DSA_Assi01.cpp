@@ -51,7 +51,7 @@ public:
 	}
 	void Enqueue(T x) {
 		if (!isFull()) {
-			arr[(front+size)%MAX] = x;
+			arr[(front + size) % MAX] = x;
 			size++;
 		}
 		else
@@ -59,7 +59,7 @@ public:
 	}
 	void Dequeue() {
 		if (!isEmpty()) {
-			front = (front+1) % MAX;
+			front = (front + 1) % MAX;
 			size--;
 		}
 		else
@@ -68,7 +68,7 @@ public:
 	void PrintQue() {
 		if (!isEmpty()) {
 			int i = front;
-			for (int i = 0; i < size; i = (i+1) % MAX)
+			for (int i = 0; i < size; i = (i + 1) % MAX)
 				cout << arr[i] << " ";
 			cout << endl;
 		}
@@ -83,7 +83,7 @@ private:
 public:
 	Stack() { top = -1; }
 	bool isEmpty() { return (top == -1);}
-	bool isFull() { return (top+1 == MAX); }
+	bool isFull() { return (top + 1 == MAX); }
 	void Push(T x) {
 		if (!isFull())
 			arr[++top] = x;
@@ -112,347 +112,40 @@ public:
 		return ((node->lChild == NULL) && (node->rChild == NULL));
 	}
 
-//	Iterative Methods
-	void createTreeIt() {
-		cout << "Enter data for root: ";
-		int x; cin >> x;
-		root = new Node(x);
-		Queue<Node*> qu;
-		qu.Enqueue(root);
-		while (!qu.isEmpty()) {
-			Node *curr = qu.Front(); qu.Dequeue();
-			cout << "Enter data for left child of " << curr->data << " or -1: ";
-			int x; cin >> x;
-			if (x != -1) {
-				curr->lChild = new Node(x);
-				qu.Enqueue(curr->lChild);
-			}
-			cout << "Enter data for right child of " << curr->data << " or -1: ";
-			cin >> x;
-			if (x != -1) {
-				curr->rChild = new Node(x);
-				qu.Enqueue(curr->rChild);
-			}
-		}
-	}
-	void InorderIt() {
-		Stack<Node*> stk;
-		Node* curr = root;
-		while (curr != NULL || !stk.isEmpty()) {
-			if (curr != NULL) {
-				stk.Push(curr);
-				curr = curr->lChild;
-			}
-			else {
-				curr = stk.Top(); stk.Pop();
-				cout << curr->data << " ";
-				curr = curr->rChild;
-			}
-		}
-		cout << endl;
-	}
-	void PreorderIt() {
-		Stack<Node*> stk;
-		Node* curr = root;
-		while (curr != NULL || !stk.isEmpty()) {
-			if (curr != NULL) {
-				cout << curr->data << " ";
-				stk.Push(curr);
-				curr = curr->lChild;
-			}
-			else {
-				curr = stk.Top(); stk.Pop();
-				curr = curr->rChild;
-			}
-		}
-		cout << endl;
-	}
-	void PostorderIt() {
-		Stack<Node*> stk1, stk2;
-		stk1.Push(root);
-		while (!stk1.isEmpty()) {
-			Node* curr = stk1.Top();
-			stk1.Pop();
-			stk2.Push(curr);
+//	Iterative Methods - declarations
+	void createTreeIt();
+	void InorderIt();
+	void PreorderIt();
+	void PostorderIt();
+	void displayIt();
+	int getHeightIt();
+	Node* copyTreeIt(Node*);
+	void mirrorImgIt();
+	int countNodesIt();
+	int countLeafNodesIt();
+	int countInternalNodesIt();
+	void countAllTypeNodesIt();
+	void deleteTreeIt();
 
-			if (curr->lChild)
-				stk1.Push(curr->lChild);
-			if (curr->rChild)
-				stk1.Push(curr->rChild);
-		}
 
-		while (!stk2.isEmpty()) {
-			cout << stk2.Top()->data << " ";
-			stk2.Pop();
-		}
+//	Recursive Methods - declarations
+	Node* createTreeRec();
+	void Inorder(Node*);
+	void Preorder(Node*);
+	void Postorder(Node*);
+	void displayRec();
+	int getHeightRec(Node*);
+	Node* copyTreeRec(Node*);
+	void mirrorImgRec(Node*);
+	int countNodesRec(Node*);
+	int countLeafNodesRec(Node*);
+	int countInternalNodesRec(Node*);
+	void countAllTypeNodesRec();
+	void deleteTreeRec(Node*);
 
-		cout << endl;
-	}
-	void displayIt() {
-		if (isEmpty()) {
-			cout << "Empty Tree\n";
-			return;
-		}
-		cout << "Iterative Tree Traversals:\n";
-		cout << "Preorder: "; PreorderIt();
-		cout << "Inorder: "; InorderIt();
-		cout << "Postorder: "; PostorderIt();
-	}
-	int getHeightIt() {
-		if (root == NULL)
-			return 0;
-
-		int ht = 0;
-		Queue<Node*> qu;
-		qu.Enqueue(root);
-		while (true) {
-			int cnt = qu.getSize();
-
-			if (cnt == 0)
-				return ht;
-
-			for (int i = 0; i < cnt; i++) {
-				Node* curr = qu.Front(); qu.Dequeue();
-				if (curr->lChild)
-					qu.Enqueue(curr->lChild);
-				if (curr->rChild)
-					qu.Enqueue(curr->rChild);
-			}
-
-			ht++;
-		}
-	}
-	Node* copyTreeIt(Node* old_tree_root) {
-		if (old_tree_root == NULL)
-			return NULL;
-
-		Queue<Node*> new_tree_qu, old_tree_qu;
-		Node* new_tree_root = new Node(old_tree_root->data);
-
-		old_tree_qu.Enqueue(old_tree_root);
-		new_tree_qu.Enqueue(new_tree_root);
-
-		while (!old_tree_qu.isEmpty()) {
-			Node* old_curr = old_tree_qu.Front(); old_tree_qu.Dequeue();
-			Node* new_curr = new_tree_qu.Front(); new_tree_qu.Dequeue();
-
-			if (old_curr->lChild) {
-				new_curr->lChild = new Node(old_curr->lChild->data);
-				old_tree_qu.Enqueue(old_curr->lChild);
-				new_tree_qu.Enqueue(new_curr->lChild);
-			}
-
-			if (old_curr->rChild) {
-				new_curr->rChild = new Node(old_curr->rChild->data);
-				old_tree_qu.Enqueue(old_curr->rChild);
-				new_tree_qu.Enqueue(new_curr->rChild);
-			}
-		}
-
-		return new_tree_root;
-	}
-	int countNodesIt() {
-		if (root == NULL)
-			return 0;
-
-		Queue<Node*> qu;
-		qu.Enqueue(root);
-
-		int cnt = 0;
-		while (!qu.isEmpty()) {
-			Node* curr = qu.Front(); qu.Dequeue();
-			if (curr->lChild)
-				qu.Enqueue(curr->lChild);
-			if (curr->rChild)
-				qu.Enqueue(curr->rChild);
-
-			cnt++;
-		}
-
-		return cnt;
-	}
-	int countLeafNodesIt() {
-		if (root == NULL)
-			return 0;
-
-		Queue<Node*> qu;
-		qu.Enqueue(root);
-
-		int cnt = 0;
-		while (!qu.isEmpty()) {
-			Node* curr = qu.Front(); qu.Dequeue();
-
-			if (isLeaf(curr))
-				cnt++;
-
-			if (curr->lChild)
-				qu.Enqueue(curr->lChild);
-			if (curr->rChild)
-				qu.Enqueue(curr->rChild);
-		}
-
-		return cnt;
-	}
-	int countInternalNodesIt() {
-		return countNodesIt() - countLeafNodesIt();
-	}
-	int getMinIt() {
-		if (root == NULL)
-			return INT_MAX;
-
-		Queue<Node*> qu;
-		qu.Enqueue(root);
-
-		int mn = INT_MAX;
-
-		while (!qu.isEmpty()) {
-			Node* curr = qu.Front(); qu.Dequeue();
-
-			mn = min(mn, curr->data);
-
-			if (curr->lChild)
-				qu.Enqueue(curr->lChild);
-			if (curr->rChild)
-				qu.Enqueue(curr->rChild);
-		}
-
-		return mn;
-	}
-	void deleteTreeIt() {
-		if (root == NULL)
-			return;
-
-		Queue<Node*> qu;
-		qu.Enqueue(root);
-
-		while (!qu.isEmpty()) {
-			Node* curr = qu.Front(); qu.Dequeue();
-
-			if (curr->lChild)
-				qu.Enqueue(curr->lChild);
-			if (curr->rChild)
-				qu.Enqueue(curr->rChild);
-
-			delete curr;
-		}
-	}
-
-//	Recursive Methods
-	Node* createTreeRec() {
-		cout << "Enter data or -1: ";
-		int x; cin >> x;
-		if (x == -1)
-			return NULL;
-		Node* newNode = new Node(x);
-		cout << "\nEnter left child of " << newNode->data << "\n";
-		newNode->lChild = createTreeRec();
-		cout << "\nEnter right child of " << newNode->data << "\n";
-		newNode->rChild = createTreeRec();
-		return newNode;
-	}
-	void Inorder(Node* curr_root) {
-		if (curr_root != NULL) {
-			Inorder(curr_root->lChild);
-			cout << curr_root->data << " ";
-			Inorder(curr_root->rChild);
-		}
-	}
-	void Preorder(Node* curr_root) {
-		if (curr_root != NULL) {
-			cout << curr_root->data << " ";
-			Preorder(curr_root->lChild);
-			Preorder(curr_root->rChild);
-		}
-	}
-	void Postorder(Node* curr_root) {
-		if (curr_root != NULL) {
-			Postorder(curr_root->lChild);
-			Postorder(curr_root->rChild);
-			cout << curr_root->data << " ";
-		}
-	}
-	void displayRec() {
-		if (isEmpty()) {
-			cout << "Empty Tree\n";
-			return;
-		}
-		cout << "Recursive Tree Traversals:\n";
-		cout << "Preorder: "; Preorder(root); cout << endl;
-		cout << "Inorder: "; Inorder(root); cout << endl;
-		cout << "Postorder: "; Postorder(root); cout << endl;
-	}
-	int getHeightRec(Node* curr_root) {
-		if (curr_root == NULL)
-			return 0;
-
-		int lh = getHeightRec(curr_root->lChild);
-		int rh = getHeightRec(curr_root->rChild);
-
-		return 1 + max(lh, rh);
-	}
-	Node* copyTreeRec(Node* old_tree_root) {
-		if (old_tree_root == NULL)
-			return NULL;
-
-		Node* new_root = new Node(old_tree_root->data);
-		new_root->lChild = copyTreeRec(old_tree_root->lChild);
-		new_root->rChild = copyTreeRec(old_tree_root->rChild);
-
-		return new_root;
-	}
-	void mirrorImgRec(Node* curr_root) {
-		if (curr_root == NULL)
-			return;
-
-		Swap (curr_root->lChild, curr_root->rChild);
-
-		mirrorImgRec(curr_root->lChild);
-		mirrorImgRec(curr_root->rChild);
-	}
-	int countNodesRec(Node* curr_root) {
-		if (curr_root == NULL)
-			return 0;
-		return countNodesRec(curr_root->lChild) + countNodesRec(curr_root->rChild);
-	}
-	int countLeafNodesRec(Node* curr_root) {
-		if (curr_root == NULL)
-			return 0;
-
-		int cnt = 0;
-		if (isLeaf(curr_root))
-			cnt++;
-
-		cnt += countLeafNodesRec(curr_root->lChild);
-		cnt += countLeafNodesRec(curr_root->rChild);
-
-		return cnt;
-	}
-	int countInternalNodesRec() {
-		return countNodesRec(root) - countLeafNodesRec(root);
-	}
-	int getMinRec(Node* curr_root) {
-		if (curr_root == NULL)
-			return INT_MAX;
-
-		int mn = curr_root->data;
-		mn = min(mn, getMinRec(curr_root->lChild));
-		mn = min(mn, getMinRec(curr_root->rChild));
-
-		return mn;
-	}
-	void deleteTreeRec(Node* curr_root) {
-		if (curr_root == NULL)
-			return;
-
-		deleteTreeRec(curr_root->lChild);
-		deleteTreeRec(curr_root->rChild);
-
-		delete curr_root;
-	}
-
+//	Extra Tree Methods
 	void operator = (const BinaryTree bt) {
 		this->root = copyTreeIt(bt.root);
-//		this->root = copyTreeRec(bt.root);
 	}
 
 	void LevelOrder() {
@@ -476,17 +169,393 @@ public:
 	}
 };
 
+//Iterative tree methods
+void BinaryTree :: createTreeIt() {
+	cout << "Enter data for root or -1: ";
+	int x; cin >> x;
+	if (x == -1)
+		return;
+	root = new Node(x);
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+	while (!qu.isEmpty()) {
+		Node *curr = qu.Front(); qu.Dequeue();
+		cout << "Enter data for left child of " << curr->data << " or -1: ";
+		int x; cin >> x;
+		if (x != -1) {
+			curr->lChild = new Node(x);
+			qu.Enqueue(curr->lChild);
+		}
+		cout << "Enter data for right child of " << curr->data << " or -1: ";
+		cin >> x;
+		if (x != -1) {
+			curr->rChild = new Node(x);
+			qu.Enqueue(curr->rChild);
+		}
+	}
+}
+
+void BinaryTree :: InorderIt() {
+	Stack<Node*> stk;
+	Node* curr = root;
+	while (curr != NULL || !stk.isEmpty()) {
+		if (curr != NULL) {
+			stk.Push(curr);
+			curr = curr->lChild;
+		}
+		else {
+			curr = stk.Top(); stk.Pop();
+			cout << curr->data << " ";
+			curr = curr->rChild;
+		}
+	}
+	cout << endl;
+}
+
+void BinaryTree :: PreorderIt() {
+	Stack<Node*> stk;
+	Node* curr = root;
+	while (curr != NULL || !stk.isEmpty()) {
+		if (curr != NULL) {
+			cout << curr->data << " ";
+			stk.Push(curr);
+			curr = curr->lChild;
+		}
+		else {
+			curr = stk.Top(); stk.Pop();
+			curr = curr->rChild;
+		}
+	}
+	cout << endl;
+}
+
+void BinaryTree :: PostorderIt() {
+	Stack<Node*> stk1, stk2;
+	stk1.Push(root);
+	while (!stk1.isEmpty()) {
+		Node* curr = stk1.Top();
+		stk1.Pop();
+		stk2.Push(curr);
+
+		if (curr->lChild)
+			stk1.Push(curr->lChild);
+		if (curr->rChild)
+			stk1.Push(curr->rChild);
+	}
+
+	while (!stk2.isEmpty()) {
+		cout << stk2.Top()->data << " ";
+		stk2.Pop();
+	}
+
+	cout << endl;
+}
+
+void BinaryTree :: displayIt() {
+	if (isEmpty()) {
+		cout << "Empty Tree\n";
+		return;
+	}
+	cout << "Iterative Tree Traversals:\n";
+	cout << "Preorder: "; PreorderIt();
+	cout << "Inorder: "; InorderIt();
+	cout << "Postorder: "; PostorderIt();
+}
+
+int BinaryTree :: getHeightIt() {
+	if (root == NULL)
+		return 0;
+
+	int ht = 0;
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+	while (true) {
+		int cnt = qu.getSize();
+
+		if (cnt == 0)
+			return ht;
+
+		for (int i = 0; i < cnt; i++) {
+			Node* curr = qu.Front(); qu.Dequeue();
+			if (curr->lChild)
+				qu.Enqueue(curr->lChild);
+			if (curr->rChild)
+				qu.Enqueue(curr->rChild);
+		}
+
+		ht++;
+	}
+}
+
+Node* BinaryTree :: copyTreeIt(Node* old_tree_root) {
+	if (old_tree_root == NULL)
+		return NULL;
+
+	Queue<Node*> new_tree_qu, old_tree_qu;
+	Node* new_tree_root = new Node(old_tree_root->data);
+
+	old_tree_qu.Enqueue(old_tree_root);
+	new_tree_qu.Enqueue(new_tree_root);
+
+	while (!old_tree_qu.isEmpty()) {
+		Node* old_curr = old_tree_qu.Front(); old_tree_qu.Dequeue();
+		Node* new_curr = new_tree_qu.Front(); new_tree_qu.Dequeue();
+
+		if (old_curr->lChild) {
+			new_curr->lChild = new Node(old_curr->lChild->data);
+			old_tree_qu.Enqueue(old_curr->lChild);
+			new_tree_qu.Enqueue(new_curr->lChild);
+		}
+
+		if (old_curr->rChild) {
+			new_curr->rChild = new Node(old_curr->rChild->data);
+			old_tree_qu.Enqueue(old_curr->rChild);
+			new_tree_qu.Enqueue(new_curr->rChild);
+		}
+	}
+
+	return new_tree_root;
+}
+
+void BinaryTree :: mirrorImgIt() {
+	if (root == NULL)
+		return;
+
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+
+	while (!qu.isEmpty()) {
+		Node* curr = qu.Front(); qu.Dequeue();
+
+		Swap (curr->lChild, curr->rChild);
+		if (curr->lChild)
+			qu.Enqueue(curr->lChild);
+		if (curr->rChild)
+			qu.Enqueue(curr->rChild);
+	}
+}
+
+int BinaryTree :: countNodesIt() {
+	if (root == NULL)
+		return 0;
+
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+
+	int cnt = 0;
+	while (!qu.isEmpty()) {
+		Node* curr = qu.Front(); qu.Dequeue();
+		if (curr->lChild)
+			qu.Enqueue(curr->lChild);
+		if (curr->rChild)
+			qu.Enqueue(curr->rChild);
+
+		cnt++;
+	}
+
+	return cnt;
+}
+
+int BinaryTree :: countLeafNodesIt() {
+	if (root == NULL)
+		return 0;
+
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+
+	int cnt = 0;
+	while (!qu.isEmpty()) {
+		Node* curr = qu.Front(); qu.Dequeue();
+
+		if (isLeaf(curr))
+			cnt++;
+
+		if (curr->lChild)
+			qu.Enqueue(curr->lChild);
+		if (curr->rChild)
+			qu.Enqueue(curr->rChild);
+	}
+
+	return cnt;
+}
+
+int BinaryTree :: countInternalNodesIt() {
+	if (root == NULL)
+		return 0;
+
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+
+	int cnt = 0;
+	while (!qu.isEmpty()) {
+		Node* curr = qu.Front(); qu.Dequeue();
+
+		if (!isLeaf(curr))
+			cnt++;
+
+		if (curr->lChild)
+			qu.Enqueue(curr->lChild);
+		if (curr->rChild)
+			qu.Enqueue(curr->rChild);
+	}
+
+	return cnt;
+}
+
+void BinaryTree :: countAllTypeNodesIt() {
+	cout << "The Node count is\n";
+	cout << "Total Nodes: " << countNodesIt() << endl;
+	cout << "Leaf Nodes: " << countLeafNodesIt() << endl;
+	cout << "Internal Nodes: " << countInternalNodesIt() << endl;
+}
+
+void BinaryTree :: deleteTreeIt() {
+	if (root == NULL)
+		return;
+
+	Queue<Node*> qu;
+	qu.Enqueue(root);
+
+	while (!qu.isEmpty()) {
+		Node* curr = qu.Front(); qu.Dequeue();
+
+		if (curr->lChild)
+			qu.Enqueue(curr->lChild);
+		if (curr->rChild)
+			qu.Enqueue(curr->rChild);
+
+		delete curr;
+	}
+}
+
+//Recursive Tree Methods
+Node* BinaryTree :: createTreeRec() {
+	cout << "Enter data or -1: ";
+	int x; cin >> x;
+	if (x == -1)
+		return NULL;
+	Node* newNode = new Node(x);
+	cout << "\nEnter left child of " << newNode->data << "\n";
+	newNode->lChild = createTreeRec();
+	cout << "\nEnter right child of " << newNode->data << "\n";
+	newNode->rChild = createTreeRec();
+	return newNode;
+}
+
+void BinaryTree :: Inorder(Node* curr_root) {
+	if (curr_root != NULL) {
+		Inorder(curr_root->lChild);
+		cout << curr_root->data << " ";
+		Inorder(curr_root->rChild);
+	}
+}
+
+void BinaryTree :: Preorder(Node* curr_root) {
+	if (curr_root != NULL) {
+		cout << curr_root->data << " ";
+		Preorder(curr_root->lChild);
+		Preorder(curr_root->rChild);
+	}
+}
+
+void BinaryTree :: Postorder(Node* curr_root) {
+	if (curr_root != NULL) {
+		Postorder(curr_root->lChild);
+		Postorder(curr_root->rChild);
+		cout << curr_root->data << " ";
+	}
+}
+
+void BinaryTree :: displayRec() {
+	if (isEmpty()) {
+		cout << "Empty Tree\n";
+		return;
+	}
+	cout << "Recursive Tree Traversals:\n";
+	cout << "Preorder: "; Preorder(root); cout << endl;
+	cout << "Inorder: "; Inorder(root); cout << endl;
+	cout << "Postorder: "; Postorder(root); cout << endl;
+}
+
+int BinaryTree :: getHeightRec(Node* curr_root) {
+	if (curr_root == NULL)
+		return 0;
+
+	int lh = getHeightRec(curr_root->lChild);
+	int rh = getHeightRec(curr_root->rChild);
+
+	return 1 + max(lh, rh);
+}
+
+Node* BinaryTree :: copyTreeRec(Node* old_tree_root) {
+	if (old_tree_root == NULL)
+		return NULL;
+
+	Node* new_root = new Node(old_tree_root->data);
+	new_root->lChild = copyTreeRec(old_tree_root->lChild);
+	new_root->rChild = copyTreeRec(old_tree_root->rChild);
+
+	return new_root;
+}
+
+void BinaryTree :: mirrorImgRec(Node* curr_root) {
+	if (curr_root == NULL)
+		return;
+
+	Swap (curr_root->lChild, curr_root->rChild);
+
+	mirrorImgRec(curr_root->lChild);
+	mirrorImgRec(curr_root->rChild);
+}
+
+int BinaryTree :: countNodesRec(Node* curr_root) {
+	if (curr_root == NULL)
+		return 0;
+	return 1 + countNodesRec(curr_root->lChild) + countNodesRec(curr_root->rChild);
+}
+
+int BinaryTree :: countLeafNodesRec(Node* curr_root) {
+	if (curr_root == NULL)
+		return 0;
+
+	int cnt = 0;
+	if (isLeaf(curr_root))
+		cnt++;
+
+	cnt += countLeafNodesRec(curr_root->lChild);
+	cnt += countLeafNodesRec(curr_root->rChild);
+
+	return cnt;
+}
+
+int BinaryTree :: countInternalNodesRec(Node* curr_root) {
+	if (curr_root == NULL || isLeaf(curr_root)) return 0;
+	int cnt = 1;
+	cnt += countInternalNodesRec(curr_root->lChild);
+	cnt += countInternalNodesRec(curr_root->rChild);
+	return cnt;
+}
+
+void BinaryTree :: countAllTypeNodesRec() {
+	cout << "The Node count is\n";
+	cout << "Total Nodes: " << countNodesRec(root) << endl;
+	cout << "Leaf Nodes: " << countLeafNodesRec(root) << endl;
+	cout << "Internal Nodes: " << countInternalNodesRec(root) << endl;
+}
+
+void BinaryTree :: deleteTreeRec(Node* curr_root) {
+	if (curr_root == NULL)
+		return;
+
+	deleteTreeRec(curr_root->lChild);
+	deleteTreeRec(curr_root->rChild);
+
+	delete curr_root;
+}
+
 int main() {
 
-//	BinaryTree bt; bt.createTreeIt();
-//	BinaryTree new_bt = bt;
-//	new_bt.mirrorImgRec(new_bt.getRoot());
-//	cout << "Displaying Mirrored Binary Tree\n";
-//	new_bt.displayRec();
-//	new_bt.deleteTreeRec(new_bt.getRoot());
-//	bt.displayIt();
-
-	while (1) {
+	while (true) {
 		BinaryTree bt;
 
 //		Recursive or Iterative tree construction
@@ -497,7 +566,7 @@ int main() {
 		if (choice == 0)
 			break;
 
-		switch(choice) {
+		switch (choice) {
 		case 1: {
 			bt.createTreeIt();
 			bt.displayIt();
@@ -511,22 +580,26 @@ int main() {
 		}
 		default:
 			cout << "INVALID CHOICE. Try Again.\n";
-			break;
+			continue;
 		}
 
 //		Recursive or Iterative tree methods
 		while (true) {
+//			Since I'm displaying tree after most of the methods (Creation, Copying and Mirror Img) and
+//			deleting tree at the end of main while loop (by default) I have not provided options
+//			for this methods
+
 			cout << "\nIterative Tree Methods (1) or Recursive Tree Methods (2) or exit (0)?? ";
 			cin >> choice;
 
 			if (choice == 0)
 				break;
 
-			switch(choice) {
+			switch (choice) {
 			case 1: {
 //				Iterative methods
 				cout << "Choose option: \n";
-				cout << "\t1 Tree Height\n\t2 Copying a Tree\n\t3 Mirror Image\n";
+				cout << "\t1 Tree Height\n\t2 Copying a Tree\n\t3 Mirror Image\n\t4 Count Nodes (Leaf & Internal)\n";
 				cout << ": "; cin >> choice;
 
 				switch (choice) {
@@ -535,13 +608,24 @@ int main() {
 					break;
 				}
 				case 2: {
-					BinaryTree new_bt = bt;
-					cout << "Displaying Copied Binary Tree\n";
+					BinaryTree new_bt;
+					new_bt = bt;
+					cout << "---Displaying Copied Binary Tree---\n";
 					new_bt.displayIt();
+					new_bt.deleteTreeIt();
 					break;
 				}
 				case 3: {
-					cout << "Iterative mirror image is remaining\n";
+					BinaryTree new_bt;
+					new_bt = bt;
+					new_bt.mirrorImgRec(new_bt.getRoot());
+					cout << "---Displaying Mirrored Binary Tree---\n";
+					new_bt.displayIt();
+					new_bt.deleteTreeIt();
+					break;
+				}
+				case 4: {
+					bt.countAllTypeNodesIt();
 					break;
 				}
 				default:
@@ -554,7 +638,7 @@ int main() {
 			case 2: {
 //				Recursive Methods
 				cout << "Choose option: \n";
-				cout << "\t1 Tree Height\n\t2 Copying a Tree\n\t3 Mirror Image\n";
+				cout << "\t1 Tree Height\n\t2 Copying a Tree\n\t3 Mirror Image\n\t4 Count Nodes (Leaf & Internal)\n";
 				cout << ": "; cin >> choice;
 
 				switch (choice) {
@@ -563,19 +647,26 @@ int main() {
 					break;
 				}
 				case 2: {
-					BinaryTree new_bt = bt;
-					cout << "Displaying Copied Binary Tree\n";
+					BinaryTree new_bt;
+					Node* root = new_bt.copyTreeRec(bt.getRoot());
+					new_bt.setRoot(root);
+					cout << "---Displaying Copied Binary Tree---\n";
 					new_bt.displayRec();
 					new_bt.deleteTreeRec(new_bt.getRoot());
 					break;
 				}
 				case 3: {
-					BinaryTree new_bt = bt;
+					BinaryTree new_bt;
+					Node* root = new_bt.copyTreeRec(bt.getRoot());
+					new_bt.setRoot(root);
 					new_bt.mirrorImgRec(new_bt.getRoot());
-					cout << "Displaying Mirrored Binary Tree\n";
+					cout << "---Displaying Mirrored Binary Tree---\n";
 					new_bt.displayRec();
 					new_bt.deleteTreeRec(new_bt.getRoot());
-					bt.displayIt();
+					break;
+				}
+				case 4: {
+					bt.countAllTypeNodesRec();
 					break;
 				}
 				default:
@@ -590,8 +681,7 @@ int main() {
 			}
 		}
 
-		bt.deleteTreeRec(bt.getRoot());
-
+		bt.deleteTreeIt();
 	}
 
 	cout << "---END---\n";
