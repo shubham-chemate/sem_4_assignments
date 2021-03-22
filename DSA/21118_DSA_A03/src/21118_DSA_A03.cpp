@@ -15,113 +15,224 @@ public:
 	Node(int x = 0) {
 		data = x;
 		lChild = rChild = NULL;
-		lTh = rTh = false;
+		lTh = rTh = true;
 	}
 	friend class TBST;
 };
 
 class TBST {
 private:
-	Node* root;
+	Node *root, *head;
 public:
 	TBST() {
 		root = NULL;
+		head = new Node(INT_MIN);
 	}
 	Node* getRoot() {return root;}
-	Node* InsertNode(Node* curr_root, Node* inorderSucc, int x) {
-		if (curr_root == NULL) {
-			curr_root = new Node(x);
-			curr_root->rChild = inorderSucc;
-			if (inorderSucc)
-				curr_root->rTh = true;
+	void InsertNode(int x) {
+		if (root == NULL) {
+			root = new Node(x);
+			root->lChild = root->rChild = head;
+			return;
 		}
-		else if (curr_root->rTh == true) {
-            curr_root->rChild = new Node(x);
-            curr_root->rTh = false;
-            curr_root->rChild->rChild = inorderSucc;
-            curr_root->rChild->rTh = true;
+		Node *curr = root, *prev = NULL;
+		while (curr != head) {
+			prev = curr;
+			if (x < curr->data) {
+				if (curr->lTh == false)
+					curr = curr->lChild;
+				else
+					break;
+			}
+			else if (x > curr->data) {
+				if (curr->rTh == false)
+					curr = curr->rChild;
+				else
+					break;
+			}
+			else if (x == curr->data)
+				return;
 		}
-		else if (x < curr_root->data) {
-			curr_root->lChild = InsertNode(curr_root->lChild, curr_root, x);
-			curr_root->lTh = false;
+		curr = new Node(x);
+		if (x < prev->data) {
+			curr->rChild = prev;
+			curr->lChild = prev->lChild;
+			prev->lChild = curr;
+			prev->lTh = false;
 		}
-		else if (x > curr_root->data)
-			curr_root->rChild = InsertNode(curr_root->rChild, inorderSucc, x);
-		return curr_root;
-	}
-	void PrintNode(Node* n) {
-		if (n) cout << n->data << endl;
-		else cout << "Empty\n";
+		else if (x > prev->data) {
+			curr->lChild = prev;
+			curr->rChild = prev->rChild;
+			prev->rChild = curr;
+			prev->rTh = false;
+		}
 	}
 	void CreateTree() {
-		cout << "Enter data of node or -1:\n";
 		while (true) {
+			cout << "Enter data of node or -1:\n";
 			int x; cin >> x;
 			if (x == -1)
 				break;
-
-			root = InsertNode(root, NULL, x);
-//			ThInorder();
-//			ThPreorder();
+			InsertNode(x);
+			ThInorder();
 		}
-		PrintNode(root);
-		PrintNode(root->lChild);
-		PrintNode(root->lChild->lChild);
-		PrintNode(root->lChild->rChild);
 	}
 	void ThInorder() {
 		if (root == NULL) {
-			cout << "Empty Tree.\n";
+			cout << "EMPTY TREE\n";
 			return;
 		}
+
 		Node* curr = root;
-		bool byThread = false;
-		while (curr != NULL) {
-			if (byThread) {
-				cout << curr->data << " ";
-				byThread = curr->rTh;
+
+		while (curr->lTh == false)
+            curr = curr->lChild;
+
+		while (curr != head) {
+			cout << curr->data << " ";
+			if (curr->rTh == false) {
 				curr = curr->rChild;
+				while (curr->lTh == false)
+                    curr = curr->lChild;
 			}
-			else {
-				while (curr->lChild)
-					curr = curr->lChild;
-				cout << curr->data << " ";
-                byThread = curr->rTh;
+			else
 				curr = curr->rChild;
-			}
 		}
 		cout << endl;
 	}
 	void ThPreorder() {
 		if (root == NULL) {
-			cout << "Empty Tree.\n";
+			cout << "EMPTY TREE\n";
 			return;
 		}
+
 		Node* curr = root;
-		bool byThread = false;
-		while (curr != NULL) {
-			if (byThread) {
-				byThread = curr->rTh;
-				curr = curr->rChild;
-			}
+
+		while (curr != head) {
+			cout << curr->data << " ";
+			if (curr->lTh == false)
+				curr = curr->lChild;
 			else {
-				while (curr->lChild) {
-					cout << curr->data << " ";
-					curr = curr->lChild;
+				if (curr->rTh == false)
+					curr = curr->rChild;
+				else {
+					while (curr != head && curr->rTh == true)
+						curr = curr->rChild;
+                    if (curr == head)
+                        break;
+					curr = curr->rChild;
 				}
-				cout << curr->data << " ";
-                byThread = curr->rTh;
-				curr = curr->rChild;
 			}
 		}
+
 		cout << endl;
+	}
+	bool Search(Node* curr_root, int x, Node*& curr, Node*& parent) {
+		if (curr_root == head)
+			return false;
+
+		curr = curr_root;
+		if (curr_root->data == x)
+			return true;
+
+		parent = curr;
+		if (x < curr_root->data)
+			return Search(curr_root->lChild, x, curr, parent);
+		else
+			return Search(curr_root->rChild, x, curr, parent);
+	}
+	void deleteNode(int x) {
+		Node *curr = NULL, *parent = NULL;
+
+		if (!Search(root, x, curr, parent)) {
+			cout << "NOT FOUND\n";
+			return;
+		}
+
+		if (curr->lTh == false && curr->rTh == false) {
+			Node* temp = curr->rChild;
+			parent = curr;
+			while (temp->lTh == false) {
+				parent = temp;
+				temp = temp->lChild;
+			}
+			curr->data = temp->data;
+			x = temp->data;
+			curr = temp;
+		}
+
+		if (curr->lTh == true && curr->rTh == true) {
+			if (curr == parent->lChild) {
+				parent->lChild = curr->lChild;
+				parent->lTh = true;
+			}
+			else if (curr == parent->rChild) {
+				parent->rChild = curr->rChild;
+				parent->rTh = true;
+			}
+			delete curr;
+		}
+		else if (curr->lTh == false && curr->rTh == true) {
+			Node* temp = curr->lChild;
+			if (parent->lChild == curr)
+				parent->lChild = temp;
+			else
+				parent->rChild = temp;
+			while (temp->rTh == false)
+				temp = temp->rChild;
+			temp->rChild = curr->rChild;
+			delete curr;
+
+		}
+		else if (curr->lTh == true && curr->rTh == false) {
+			Node* temp = curr->rChild;
+			if (parent->lChild == curr)
+				parent->lChild = temp;
+			else
+				parent->rChild = temp;
+			while (temp->lTh == false)
+				temp = temp->lChild;
+			temp->lChild = curr->lChild;
+			delete curr;
+		}
 	}
 };
 
 int main() {
-	TBST tbt;
-	tbt.CreateTree();
-//	tbt.ThInorder();
-	cout << "----END-----\n";
+	TBST tbst;
+	while (true) {
+		cout << "\nChoose Option:\n";
+		cout << "\t1 for Insert\n\t2 for Delete\n\t3 for Traversal\n\t0 to Exit\n:";
+		int choice = 0; cin >> choice;
+
+		if (choice == 0)
+			break;
+
+		switch (choice) {
+		case 1: {
+			cout << "Enter data (for insert): ";
+			int x; cin >> x;
+			tbst.InsertNode(x);
+			cout << "Inorder: "; tbst.ThInorder();
+			break;
+		}
+		case 2: {
+			cout << "Enter data (for delete): ";
+			int x; cin >> x;
+			tbst.deleteNode(x);
+			cout << "Inorder: "; tbst.ThInorder();
+			break;
+		}
+		case 3: {
+			cout << "Tree Traversals:\n";
+			cout << "Inorder: "; tbst.ThInorder();
+			cout << "Preorder: "; tbst.ThPreorder();
+			break;
+		}
+		default:
+			cout << "INVALID CHOICE. Try Again.\n";
+		}
+	}
+	cout << "\n----END-----\n";
 	return 0;
 }
