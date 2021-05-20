@@ -26,7 +26,7 @@ private:
 public:
 	TBST() {
 		root = NULL;
-		head = new Node(INT_MIN);
+		head = new Node(0);
 	}
 	Node* getRoot() {return root;}
 	void InsertNode(int x) {
