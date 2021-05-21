@@ -1,5 +1,5 @@
 # Author : Shubham (Roll No.: 21118)
-# DSA Assignment 04 : Hashing Techniques (Linear Probing without replacement)
+# DSA Assignment 04 : Hashing Techniques (Linear Probing with replacement)
 
 class Record():
     def __init__(self, num, name):
@@ -54,12 +54,25 @@ class HashTable():
 
         idx = self.getHashVal(key)
 
-        # linear probing
-        while self.table[idx].ph_num != -1:
-            idx = (idx+1) % self.MAX_SIZE
+        # empty slot
+        if self.table[idx].ph_num == -1:
+            self.table[idx] = Record(key, val)
+            self.SIZE += 1
+        # slot occupied by element of same chain
+        elif idx == self.getHashVal(self.table[idx].ph_num):
+            while self.table[idx].ph_num != -1:
+                idx = (idx+1) % self.MAX_SIZE
+            self.table[idx] = Record(key, val)
+            self.SIZE += 1
+        # slot occupied by element of other chain -> case of replacement
+        else:
+            tmp = self.table[idx]
+            self.table[idx] = Record(key, val)
+            self.SIZE += 1
+            while self.table[idx].ph_num != -1:
+                idx = (idx+1) % self.MAX_SIZE
+            self.table[idx] = tmp
 
-        self.table[idx] = Record(key, val)
-        self.SIZE += 1
         return 1
 
     # Successful deletion returns True
@@ -111,7 +124,7 @@ def main():
                 if (record.ph_num == -1):
                     print("NOT FOUND.")
                 else:
-                    print ("FOUND. Details are:")
+                    print("FOUND. Details are:")
                     print(record)
 
             elif choice == 3:
@@ -119,6 +132,7 @@ def main():
                     print("DELETION SUCCESSFUL.")
                 else:
                     print("DELETION FAILED.")
+            ht.Print()
         print()
 
 
