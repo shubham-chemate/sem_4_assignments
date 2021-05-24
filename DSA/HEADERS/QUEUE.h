@@ -8,37 +8,40 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-const int MAX = 100;
-
 template <typename T>
 class QUEUE {
 private:
-	T a[MAX];
-	int front;
+	T* a;
+	int front, size, rear;
 public:
-	QUEUE() {
-		front = -1;
+	QUEUE(int size) {
+		front = 0, rear = 0;
+		this->size = size;
+		a = new T[size];
 	}
 	bool Empty() {
-		return front == -1;
+		return front == rear;
 	}
+	bool isFull() {
+		int temp = (rear + 1) % size;
+		return (temp == front);
+	};
 	void Push(T x) {
-		front++;
-		if (front < MAX)
-			a[front] = x;
-		else front--;
+		if (!isFull()) {
+			rear = (rear + 1) % size;
+			a[rear] = x;
+		}
 	}
 	void Pop() {
-		if (!Empty())
-			front--;
+		if (Empty()) return;
+		front = (front + 1) % size;
 	}
 	T Front() {
-		if (!Empty())
-			return a[front];
-		else return -1;
+		return a[front+1];
+	}
+	~QUEUE() {
+		delete[] a;
 	}
 };
-
-
 
 #endif /* QUEUE_H_ */

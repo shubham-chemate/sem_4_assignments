@@ -17,7 +17,6 @@ private:
 	Node *next;
 public:
 	Node(int x = 0);
-	friend ostream& operator <<(ostream &dout, Node);
 	friend class Graph;
 };
 
@@ -34,6 +33,7 @@ public:
 	void bfs(int src);
 	void dfs_ut(int u, bool vis[]);
 	void dfs(int src);
+	void dfs_it(int src);
 };
 
 
