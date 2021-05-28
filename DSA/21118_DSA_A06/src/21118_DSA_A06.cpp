@@ -16,7 +16,7 @@ int main() {
 		cout << "Enter number of vertices and edges:\n";
 		cin >> n >> m;
 		Graph g(n, m);
-		cout << "Enter edges (input format: source <space> destination)\n";
+		cout << "Enter edges (input format: vertex1 <space> vertex2)\n";
 		for (int i = 0; i < m; i++) {
 			cin >> u >> v;
 			g.addEdge(u, v);
